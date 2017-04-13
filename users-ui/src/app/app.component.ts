@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Http } from '@angular/http';
+import {  } from '@angular/http';
 import { FormsModule } from "@angular/forms";
 import { NgModule }      from '@angular/core';
-import { Headers } from '@angular/http';
+import { Http, Headers, URLSearchParams } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 
 @Component({
@@ -35,10 +35,9 @@ export class AppComponent implements OnInit {
     }
 
     searchUsers() {
-        const headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        headers.append('Accept', 'application/json');
-        this.http.post("http://localhost:8080/users/resources/users", this.search, headers).toPromise()
+        let params = new URLSearchParams();
+        params.set('searchstring', this.search.searchstring);
+        this.http.get("http://localhost:8080/users/resources/users", {search: params}).toPromise()
             .then(r => r.json())
             .then( r => this.users = r);
     }

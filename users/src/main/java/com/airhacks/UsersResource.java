@@ -17,6 +17,8 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonReader;
 import javax.persistence.EntityManager;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 
@@ -28,7 +30,7 @@ public class UsersResource {
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public JsonArray newUser(String json) throws Exception {
+    public JsonArray newUser(String json) {
         JsonObject object;
         try (JsonReader jsonReader = Json.createReader(new StringReader(json))) {
             object = jsonReader.readObject();
@@ -49,14 +51,22 @@ public class UsersResource {
         em.persist(newUser); 
         em.flush();
         em.getTransaction().commit();
-        return this.users();
+        return this.users("");
     }
     
     // get all users
     @GET
-    public JsonArray users() {
+    public JsonArray users(@DefaultValue("") @QueryParam("searchstring") String searchString) {
         EntityManager em = emf.createEntityManager();
-        List<Users> usersList = em.createNamedQuery("Users.findAll").getResultList();
+        List<Users> usersList;
+        if (searchString.equals("")) {
+            usersList = em.createNamedQuery("Users.findAll").getResultList();
+        } else {
+            usersList = em.createNamedQuery("Users.findByName")
+                .setParameter("firstName", searchString)
+                .setParameter("lastName", searchString)
+                .getResultList();
+        }
         JsonArrayBuilder jsonArray = Json.createArrayBuilder();
         usersList.forEach((u) -> {
             jsonArray.add(user(u.getFirstName(), u.getLastName(), u.getDateOfBirth()));
@@ -64,7 +74,7 @@ public class UsersResource {
         return jsonArray.build();
     }
     
-    private JsonObject user(String firstName, String lastName, Date dateOfBirth) {
+    public JsonObject user(String firstName, String lastName, Date dateOfBirth) {
         SimpleDateFormat sdfr = new SimpleDateFormat("dd/MMM/yyyy");
         String dateString = "";
         try {
