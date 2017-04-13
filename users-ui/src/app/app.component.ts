@@ -19,8 +19,10 @@ export class AppComponent implements OnInit {
     constructor(private http: Http) {
     }
 
+    // DEBUG, set to http://localhost:8080
+    // PRODUCTION, set to http://ec2-54-233-108-223.sa-east-1.compute.amazonaws.com:8080
     ngOnInit() {
-        this.http.get("http://localhost:8080/users/resources/users").toPromise()
+        this.http.get("http://ec2-54-233-108-223.sa-east-1.compute.amazonaws.com:8080/users/resources/users").toPromise()
             .then(r => r.json())
             .then( r => this.users = r);
     }
@@ -29,7 +31,7 @@ export class AppComponent implements OnInit {
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
         headers.append('Accept', 'application/json');
-        this.http.post("http://localhost:8080/users/resources/users", this.user, headers).toPromise()
+        this.http.post("http://ec2-54-233-108-223.sa-east-1.compute.amazonaws.com:8080/users/resources/users", this.user, headers).toPromise()
             .then(r => r.json())
             .then( r => this.users = r);
     }
@@ -37,7 +39,7 @@ export class AppComponent implements OnInit {
     searchUsers() {
         let params = new URLSearchParams();
         params.set('searchstring', this.search.searchstring);
-        this.http.get("http://localhost:8080/users/resources/users", {search: params}).toPromise()
+        this.http.get("http://ec2-54-233-108-223.sa-east-1.compute.amazonaws.com:8080/users/resources/users", {search: params}).toPromise()
             .then(r => r.json())
             .then( r => this.users = r);
     }
